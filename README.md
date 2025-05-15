@@ -25,10 +25,62 @@ To implement MESSAGE AUTHENTICATION CODE(MAC)
 5. Security: The security of the MAC relies on the secret key \( K \) and the strength of the hash function \( H \), ensuring that an attacker cannot forge a valid MAC without knowledge of the key.
 
 ## Program:
+```c
+#include <stdio.h>
+#include <string.h>
 
+// A simple hash-like function (not secure, just for demonstration)
+// Computes sum of ASCII values mod 256
+unsigned char simple_hash(const char *data) {
+    unsigned int sum = 0;
+    for (int i = 0; data[i] != '\0'; i++) {
+        sum += (unsigned char)data[i];
+    }
+    return (unsigned char)(sum % 256);
+}
 
+// Function to compute MAC = hash(key || message)
+unsigned char compute_mac(const char *key, const char *message) {
+    char combined[512];
+    // concatenate key and message
+    strcpy(combined, key);
+    strcat(combined, message);
 
+    return simple_hash(combined);
+}
+
+int main() {
+    char key[100], message[400];
+    unsigned char mac, received_mac;
+
+    printf("Enter secret key: ");
+    fgets(key, sizeof(key), stdin);
+    key[strcspn(key, "\n")] = '\0';  // Remove newline
+
+    printf("Enter message: ");
+    fgets(message, sizeof(message), stdin);
+    message[strcspn(message, "\n")] = '\0';  // Remove newline
+
+    // Generate MAC for the message
+    mac = compute_mac(key, message);
+    printf("Generated MAC: %02X\n", mac);
+
+    // Simulate verification by recomputing MAC
+    printf("Enter received MAC (hex): ");
+    scanf("%2hhx", &received_mac);
+
+    if (received_mac == compute_mac(key, message)) {
+        printf("Message is authentic and unchanged.\n");
+    } else {
+        printf("Message authentication failed.\n");
+    }
+
+    return 0;
+}
+
+```
 ## Output:
+![image](https://github.com/user-attachments/assets/20301ad7-9258-40c2-bb69-605b427f9f2c)
 
 
 ## Result:
